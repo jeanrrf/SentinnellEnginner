@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+storage/audio-temp/*
+storage/logs/*
+storage/meetings/*
+storage/transcripts/*
+storage/exports/*
+!storage/**/.gitkeep
+*.db
+.DS_Store
