@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id        String    @id @default(uuid())
+  name      String
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  meetings  Meeting[]
+}
+
+model Meeting {
+  id        String   @id @default(uuid())
+  clientId  String?
+  title     String
+  objective String?
+  status    String
+  summary   String?
+  startedAt DateTime?
+  endedAt   DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client    Client? @relation(fields: [clientId], references: [id])
+  segments  TranscriptSegment[]
+  insights  Insight[]
+  outputs   ProjectOutput[]
+}
+
+model TranscriptSegment {
+  id         String   @id @default(uuid())
+  meetingId  String
+  speaker    String
+  channel    String
+  text       String
+  startMs    Int?
+  endMs      Int?
+  confidence Float?
+  createdAt  DateTime @default(now())
+
+  meeting    Meeting @relation(fields: [meetingId], references: [id])
+  insights   Insight[]
+}
+
+model Insight {
+  id          String   @id @default(uuid())
+  meetingId   String
+  segmentId   String?
+  type        String
+  priority    String
+  title       String
+  description String?
+  question    String?
+  evidence    String?
+  accepted    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  meeting     Meeting @relation(fields: [meetingId], references: [id])
+  segment     TranscriptSegment? @relation(fields: [segmentId], references: [id])
+}
+
+model ProjectOutput {
+  id        String   @id @default(uuid())
+  meetingId String
+  type      String
+  title     String
+  content   String
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+
+  meeting   Meeting @relation(fields: [meetingId], references: [id])
+}
